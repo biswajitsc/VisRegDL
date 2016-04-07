@@ -22,7 +22,7 @@ def convert(imgf, labelf, outf, n):
     o.close()
     l.close()
 
-convert("train-images-idx3-ubyte", "train-labels-idx1-ubyte",
-        "mnist_train.csv", 60000)
-convert("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte",
-        "mnist_test.csv", 10000)
+convert("./datasets/mnist/train-images-idx3-ubyte", "./datasets/mnist/train-labels-idx1-ubyte",
+        "./datasets/mnist/mnist_train.csv", 60000)
+convert("./datasets/mnist/t10k-images-idx3-ubyte", "./datasets/mnist/t10k-labels-idx1-ubyte",
+        "./datasets/mnist/mnist_test.csv", 10000)

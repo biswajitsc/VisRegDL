@@ -2,9 +2,10 @@
 # This scripts downloads the mnist data and unzips it.
 # Modified from https://github.com/BVLC/caffe/blob/master/data/mnist/get_mnist.sh
 
-cd datasets
-mkdir mnist
-cd mnist
+cd ./datasets/mnist
+rm *
+
+echo "Contains mnist dataset" > readme
 
 echo "Downloading..."
 

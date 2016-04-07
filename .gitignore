@@ -2,4 +2,7 @@
 *.txt
 *.npz
 *.gz
-
+train-images*
+*.csv
+t10k*
+train-label*

@@ -22,20 +22,10 @@ def batch_iterable(
                y[num_batches * batch_size:])
 
 
-class scaled_softmax:
-
-    def __init__(self, temp):
-        self.t = temp
-
-    def __call__(self, x):
-        return L.nonlinearities.softmax(x / self.t)
-
-
 class nnet:
 
     def __init__(
         self, n_in, n_out, h_layers,
-        i_drop=None,
         l_drops=None,
         lam=0, Temp=1,
         inp_max=False,

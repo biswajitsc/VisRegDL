@@ -15,7 +15,7 @@ import datetime
 import pandas as pd
 
 
-train = pd.read_csv('../Datasets/mnist/mnist_train.csv')
+train = pd.read_csv('./datasets/mnist/mnist_train.csv')
 
 trainX = train.values[:, 1:]
 trainY = train.values[:, 0]
@@ -28,7 +28,7 @@ trainY = np.asarray(temp, dtype='float32')
 trainX = np.asarray(trainX, dtype='float32') / 255.0
 
 
-test = pd.read_csv('../Datasets/mnist/mnist_test.csv')
+test = pd.read_csv('./datasets/mnist/mnist_test.csv')
 
 testX = test.values[:, 1:]
 testY = test.values[:, 0]
@@ -49,8 +49,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
-        # l_drops=[0.3, 0.3],
         lam=20,
         Temp=1,
         nonlinearity=L.nonlinearities.rectify,
@@ -65,8 +63,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
-        # l_drops=[0.3, 0.3],
         lam=20,
         Temp=1,
         nonlinearity=L.nonlinearities.rectify,
@@ -81,7 +77,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=10,
         Temp=1,
@@ -97,7 +92,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=1,
         Temp=1,
@@ -113,7 +107,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=None,
         Temp=1,
@@ -129,7 +122,6 @@ def main():
         n_in=784,
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=None,
         Temp=1,
