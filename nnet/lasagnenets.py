@@ -43,6 +43,7 @@ class nnet:
         clam: weight of VR regularizer.
         '''
 
+        # Seed for reproducibility
         np.random.seed(0)
 
         self.input = T.fmatrix('input')

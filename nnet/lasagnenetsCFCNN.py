@@ -43,6 +43,7 @@ class nnet:
         Input size has been hardcoded to (3, 32, 32).
         '''
 
+        # Seed for reproducibility
         np.random.seed(0)
 
         self.input = T.ftensor4('input')
