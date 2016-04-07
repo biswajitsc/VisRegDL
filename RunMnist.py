@@ -45,69 +45,69 @@ testX = testX.reshape(-1, 784)
 
 
 def main():
-    # nnet = LN.nnet(
-    #     n_in=784,
-    #     n_out=10,
-    #     h_layers=[1000, 1000],
-    #     #     i_drop=0.3,
-    #     # l_drops=[0.3, 0.3],
-    #     lam=20,
-    #     Temp=1,
-    #     nonlinearity=L.nonlinearities.rectify,
-    #     clam=1
-    # )
+    nnet = LN.nnet(
+        n_in=784,
+        n_out=10,
+        h_layers=[1000, 1000],
+        #     i_drop=0.3,
+        # l_drops=[0.3, 0.3],
+        lam=20,
+        Temp=1,
+        nonlinearity=L.nonlinearities.rectify,
+        clam=1
+    )
 
-    # nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-    #            lrate=0.1, gamma=0.9, batch_size=100, iters=200,
-    #            thresh=100, filename='runs/Mnist_Vl_L2.npz')
+    nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
+               lrate=0.1, gamma=0.9, batch_size=100, iters=200,
+               thresh=100, filename='runs/Mnist_Vl_L2.npz')
 
-    # nnet = LN.nnet(
-    #     n_in=784,
-    #     n_out=10,
-    #     h_layers=[1000, 1000],
-    #     #     i_drop=0.3,
-    #     # l_drops=[0.3, 0.3],
-    #     lam=20,
-    #     Temp=1,
-    #     nonlinearity=L.nonlinearities.rectify,
-    #     clam=None
-    # )
+    nnet = LN.nnet(
+        n_in=784,
+        n_out=10,
+        h_layers=[1000, 1000],
+        #     i_drop=0.3,
+        # l_drops=[0.3, 0.3],
+        lam=20,
+        Temp=1,
+        nonlinearity=L.nonlinearities.rectify,
+        clam=None
+    )
 
-    # nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-    #            lrate=0.1, gamma=0.9, batch_size=100, iters=200,
-    #            thresh=100, filename='runs/Mnist_L2.npz')
+    nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
+               lrate=0.1, gamma=0.9, batch_size=100, iters=200,
+               thresh=100, filename='runs/Mnist_L2.npz')
 
-    # nnet = LN.nnet(
-    #     n_in=784,
-    #     n_out=10,
-    #     h_layers=[1000, 1000],
-    #     #     i_drop=0.3,
-    #     l_drops=[0.3, 0.3],
-    #     lam=10,
-    #     Temp=1,
-    #     nonlinearity=L.nonlinearities.rectify,
-    #     clam=1
-    # )
+    nnet = LN.nnet(
+        n_in=784,
+        n_out=10,
+        h_layers=[1000, 1000],
+        #     i_drop=0.3,
+        l_drops=[0.3, 0.3],
+        lam=10,
+        Temp=1,
+        nonlinearity=L.nonlinearities.rectify,
+        clam=1
+    )
 
-    # nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-    #            lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-    #            thresh=100, filename='runs/Mnist_Vl_L2_Dr.npz')
+    nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
+               lrate=0.01, gamma=0.9, batch_size=100, iters=200,
+               thresh=100, filename='runs/Mnist_Vl_L2_Dr.npz')
 
-    # nnet = LN.nnet(
-    #     n_in=784,
-    #     n_out=10,
-    #     h_layers=[1000, 1000],
-    #     #     i_drop=0.3,
-    #     l_drops=[0.3, 0.3],
-    #     lam=1,
-    #     Temp=1,
-    #     nonlinearity=L.nonlinearities.rectify,
-    #     clam=None
-    # )
+    nnet = LN.nnet(
+        n_in=784,
+        n_out=10,
+        h_layers=[1000, 1000],
+        #     i_drop=0.3,
+        l_drops=[0.3, 0.3],
+        lam=1,
+        Temp=1,
+        nonlinearity=L.nonlinearities.rectify,
+        clam=None
+    )
 
-    # nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-    #            lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-    #            thresh=100, filename='runs/Mnist_L2_Dr.npz')
+    nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
+               lrate=0.01, gamma=0.9, batch_size=100, iters=200,
+               thresh=100, filename='runs/Mnist_L2_Dr.npz')
 
     nnet = LN.nnet(
         n_in=784,
@@ -125,21 +125,21 @@ def main():
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
                thresh=100, filename='runs/Mnist_Dr.npz')
 
-    # nnet = LN.nnet(
-    #     n_in=784,
-    #     n_out=10,
-    #     h_layers=[1000, 1000],
-    #     #     i_drop=0.3,
-    #     l_drops=[0.3, 0.3],
-    #     lam=None,
-    #     Temp=1,
-    #     nonlinearity=L.nonlinearities.rectify,
-    #     clam=1
-    # )
+    nnet = LN.nnet(
+        n_in=784,
+        n_out=10,
+        h_layers=[1000, 1000],
+        #     i_drop=0.3,
+        l_drops=[0.3, 0.3],
+        lam=None,
+        Temp=1,
+        nonlinearity=L.nonlinearities.rectify,
+        clam=1
+    )
 
-    # nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-    #            lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-    #            thresh=100, filename='runs/Mnist_Vl_Dr.npz')
+    nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
+               lrate=0.01, gamma=0.9, batch_size=100, iters=200,
+               thresh=100, filename='runs/Mnist_Vl_Dr.npz')
 
 
 if __name__ == '__main__':
