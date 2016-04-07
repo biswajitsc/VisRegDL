@@ -49,6 +49,18 @@ def main():
     '''
     Creates neural networks with various parameters and trains them.
     '''
+
+    '''
+    n_in: input size
+    n_out: output size
+    h_layer: hidden layer sizes
+    l_drops: dropout rates of hidden layers.
+        Set as None if dropout not to be used.
+    nonlinearity: activation function to be used.
+    lam: weight of the L2 regularizer.
+        Set as None if L2 regualizer not to be used.
+    clam: weight of VR regularizer.
+    '''
     ####################################################
     # VR + L2
     nnet = LN.nnet(
