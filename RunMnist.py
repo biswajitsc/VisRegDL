@@ -57,7 +57,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.1, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_L2.npz')
+               thresh=100, filename='runs/Mnist_Vl_L2')
 
     nnet = LN.nnet(
         n_in=784,
@@ -71,7 +71,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.1, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_L2.npz')
+               thresh=100, filename='runs/Mnist_L2')
 
     nnet = LN.nnet(
         n_in=784,
@@ -86,7 +86,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_L2_Dr.npz')
+               thresh=100, filename='runs/Mnist_Vl_L2_Dr')
 
     nnet = LN.nnet(
         n_in=784,
@@ -101,7 +101,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_L2_Dr.npz')
+               thresh=100, filename='runs/Mnist_L2_Dr')
 
     nnet = LN.nnet(
         n_in=784,
@@ -116,7 +116,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Dr.npz')
+               thresh=100, filename='runs/Mnist_Dr')
 
     nnet = LN.nnet(
         n_in=784,
@@ -131,7 +131,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_Dr.npz')
+               thresh=100, filename='runs/Mnist_Vl_Dr')
 
 
 if __name__ == '__main__':

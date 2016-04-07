@@ -141,7 +141,7 @@ class nnet:
 
     def savemodel(self, filename):
         vals = L.layers.get_all_param_values(self.output_layer)
-        np.savez(filename, vals)
+        np.savez(filename+'.npz', vals)
 
     def loadmodel(self, filename):
         vals = np.load(filename)['arr_0']

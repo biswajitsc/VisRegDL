@@ -62,8 +62,6 @@ def main():
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
-        # l_drops=[0.3, 0.3],
         lam=500,
         Temp=1,
         nonlinearity=L.nonlinearities.rectify,
@@ -72,13 +70,11 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_L2.npz')
+               thresh=70, filename='runs/Cifar_Vl_L2')
 
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
-        # l_drops=[0.3, 0.3],
         lam=500,
         Temp=1,
         nonlinearity=L.nonlinearities.rectify,
@@ -87,12 +83,11 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_L2.npz')
+               thresh=70, filename='runs/Cifar_L2')
 
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=10,
         Temp=1,
@@ -102,12 +97,11 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_L2_Dr.npz')
+               thresh=70, filename='runs/Cifar_Vl_L2_Dr')
 
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=10,
         Temp=1,
@@ -117,12 +111,11 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.001, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_L2_Dr.npz')
+               thresh=70, filename='runs/Cifar_L2_Dr')
 
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=None,
         Temp=1,
@@ -132,12 +125,11 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.001, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Dr.npz')
+               thresh=70, filename='runs/Cifar_Dr')
 
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
-        #     i_drop=0.3,
         l_drops=[0.3, 0.3],
         lam=None,
         Temp=1,
@@ -147,7 +139,7 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_Dr.npz')
+               thresh=70, filename='runs/Cifar_Vl_Dr')
 
 
 if __name__ == '__main__':
