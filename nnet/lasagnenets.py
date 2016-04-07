@@ -27,30 +27,33 @@ class nnet:
     def __init__(
         self, n_in, n_out, h_layers,
         l_drops=None,
-        lam=0, Temp=1,
-        inp_max=False,
         nonlinearity=L.nonlinearities.sigmoid,
+        lam=0,
         clam=None
     ):
+        '''
+        n_in: input size
+        n_out: output size
+        h_layer: hidden layer sizes
+        l_drops: dropout rates of hidden layers.
+            Set as None if dropout not to be used.
+        nonlinearity: activation function to be used.
+        lam: weight of the L2 regularizer.
+            Set as None if L2 regualizer not to be used.
+        clam: weight of VR regularizer.
+        '''
 
         np.random.seed(0)
 
-        if not inp_max:
-            self.input = T.fmatrix('input')
-        else:
-            self.maxinput = TH.shared(np.zeros((1, n_in)), 'input')
-            self.input = self.maxinput * TH.shared(np.ones((1, n_in)), 'ones')
-
+        self.input = T.fmatrix('input')
         self.layers = []
 
         l_in = L.layers.InputLayer(shape=(None, n_in), input_var=self.input)
-
-        if i_drop is not None and not inp_max:
-            curr = L.layers.DropoutLayer(l_in, p=i_drop, rescale=True)
-        else:
-            curr = l_in
+        curr = l_in
 
         for i, j in enumerate(h_layers):
+
+            # Create the layers.
             curr = L.layers.DenseLayer(
                 curr, num_units=j,
                 nonlinearity=nonlinearity,
@@ -61,15 +64,10 @@ class nnet:
                 b=L.init.Constant(0.0)
             )
             self.layers.append(curr)
-            if not inp_max:
-                if l_drops is not None and l_drops[i] is not None:
-                    curr = L.layers.DropoutLayer(
-                        curr, p=l_drops[i], rescale=True
-                    )
-
-        final_nonlinearity = L.nonlinearities.softmax
-        if Temp != 1:
-            final_nonlinearity = scaled_softmax(Temp)
+            if l_drops is not None and l_drops[i] is not None:
+                curr = L.layers.DropoutLayer(
+                    curr, p=l_drops[i], rescale=True
+                )
 
         self.output_layer = L.layers.DenseLayer(
             curr, num_units=n_out,
@@ -77,8 +75,9 @@ class nnet:
         )
         self.layers.append(self.output_layer)
 
+        # Create the softmax output layer.
         self.output_layer = L.layers.NonlinearityLayer(
-            self.output_layer, nonlinearity=final_nonlinearity)
+            self.output_layer, nonlinearity=L.nonlinearities.softmax)
 
         self.output = L.layers.get_output(self.output_layer)
         self.test_output = L.layers.get_output(
@@ -86,45 +85,53 @@ class nnet:
         )
         self.target = T.fmatrix('target')
 
+        # Get all parameters.
         regs = L.layers.get_all_params(self.output_layer, regularizable=True)
+
+        # Get the L2 regularization term
+        #       = mean of squares of weight parameters.
         self.reg = T.mean(regs[1] * regs[1])
         for par in regs[2:]:
             self.reg += T.mean(par * par)
 
+        # Get the classification loss term.
         self.loss = L.objectives.categorical_crossentropy(
             self.output, self.target
         )
+        self.loss = T.mean(self.loss)
 
+        # Get the first layer weights.
         l1wts = regs[0].dimshuffle(1, 0).reshape((-1, 1, 28, 28))
 
+        # Define the laplacian kernel.
         convlen = 3
         cW = [-1 for i in xrange(convlen * convlen)]
         cW[(convlen * convlen - 1) / 2] = convlen * convlen - 1
-
         cW = TH.shared(
             np.asarray(cW, dtype=T.config.floatX).reshape(
                 1, 1, convlen, convlen),
             name='cW'
         )
 
-        self.clarity = conv.conv2d(l1wts, cW, border_mode='full')
+        # Convolute the weight matrix.
+        self.conved = conv.conv2d(l1wts, cW, border_mode='full')
+        # Get the VL term.
+        self.vl = T.mean(self.conved * self.conved)
 
-        self.loss = T.mean(self.loss)
-        self.closs = T.mean(self.clarity * self.clarity)
-
+        # Add the regularizer term to the total loss function if
+        # their parameters are not None.
         if clam is not None:
-            self.closs = clam * self.closs
-            self.loss += self.closs
+            self.vl = clam * self.vl
+            self.loss += self.vl
         else:
             self.reg += T.mean(regs[0] * regs[0])
-
         if lam is not None:
             self.reg = self.reg * lam
             self.loss += self.reg
 
     def savemodel(self, filename):
         vals = L.layers.get_all_param_values(self.output_layer)
-        np.savez(filename, vals)
+        np.savez(filename+'.npz', vals)
 
     def loadmodel(self, filename):
         vals = np.load(filename)['arr_0']
@@ -145,11 +152,7 @@ class nnet:
         print "Training ... "
 
         params = L.layers.get_all_params(self.output_layer, trainable=True)
-        # grad = T.grad(self.loss, params)
-        # grads = []
-
-        outputs = [self.loss, self.closs, self.reg]
-        # outputs.extend(grad)
+        outputs = [self.loss, self.vl, self.reg]
         inputs = [self.input, self.target]
 
         updates = L.updates.nesterov_momentum(
@@ -160,39 +163,35 @@ class nnet:
 
         last_acc = 0.10
 
+        # For each iteration.
         for i in xrange(iters):
             tot_loss = 0.0
-            tot_closs = 0.0
+            tot_vl = 0.0
             tot_regloss = 0.0
             cnt = 0
+
+            # For each mini-batch.
             for bx, by in batch_iterable(x, y, batch_size):
+
+                # One training iteration
                 train_outs = self.trainer(bx, by)
                 [c_loss, tc_loss, reg_loss] = train_outs[0:3]
-                # grad_out = train_outs[3:]
-
-                # if np.random.rand() < 0.001:
-                #     for g in grad_out:
-                #         grads.extend(np.asarray(g).flatten())
 
                 tot_loss += c_loss
-                tot_closs += tc_loss
+                tot_vl += tc_loss
                 tot_regloss += reg_loss
                 cnt += 1
             print "Iteration {0}, Loss = {1}, {2}, {3}"\
-                .format(i, tot_loss / cnt, tot_closs / cnt, tot_regloss / cnt)
+                .format(i, tot_loss / cnt, tot_vl / cnt, tot_regloss / cnt)
             logfile.write(
                 '{} {} {}\n'.format(
-                    tot_loss / cnt, tot_closs / cnt, tot_regloss / cnt
+                    tot_loss / cnt, tot_vl / cnt, tot_regloss / cnt
                 )
             )
             logfile.flush()
 
-            if np.isnan(tot_loss) or np.isnan(tot_closs):
+            if np.isnan(tot_loss) or np.isnan(tot_vl):
                 return last_acc
-
-            if testx is None or testy is None:
-                testx = x
-                testy = y
 
             if i % 10 == 0:
                 curr_acc = self.test(testx, testy, batch_size)
@@ -204,6 +203,7 @@ class nnet:
             if i >= 10 and last_acc <= 0.9:
                 return last_acc
 
+            # Decrease learning rate by 10 after every 'thresh' iterations.
             if i % thresh == 0 and i > 0:
                 lrate = np.float32(lrate / 10.0)
                 updates = L.updates.nesterov_momentum(
@@ -215,8 +215,6 @@ class nnet:
             sys.stdout.flush()
 
         logfile.close()
-        # grads = np.histogram(grads, bins=1000)
-        # np.savez(filename + '_grads.npz', grads)
 
         return self.test(testx, testy, batch_size)
 
@@ -258,33 +256,6 @@ class nnet:
     def getx(self):
         return self.maxinput.get_value()
 
-    def max_inp(self, layer_num, node_num, l_rate, gamma, iters, energy):
-        node = L.layers.get_output(
-            self.layers[layer_num], deterministic=True
-        )[0][node_num]
-
-        grad = T.grad(node, self.maxinput)
-        updates = [(self.maxinput, self.maxinput + grad)]
-
-        maxer = TH.function(
-            inputs=[],
-            outputs=[node],
-            updates=updates
-        )
-
-        print 'Maximizing ...'
-        for i in xrange(iters):
-            cval = maxer()
-            currx = self.getx()
-            # currx = currx - (currx < 0) * currx
-            # assert(np.all(currx >= 0))
-            curre = np.sqrt(np.sum(currx * currx))
-            if curre > 0:
-                self.setx(currx / curre * energy)
-
-        print 'Node value =', cval
-        return cval
-
     def get_layer(self, layer_num, input):
         layer = L.layers.get_output(
             self.layers[layer_num], deterministic=True
@@ -298,8 +269,8 @@ class nnet:
 
         return layer_out(input)
 
-    def get_clarity_val(self, ind):
-        img = self.clarity[ind]
-        vl = T.sum(img * img)
-        get_conv = TH.function(inputs=[], outputs=[img, vl])
+    def get_vl_val(self, ind):
+        img = self.conved[ind]
+        conved = T.sum(img * img)
+        get_conv = TH.function(inputs=[], outputs=[img, conved])
         return get_conv()

@@ -21,15 +21,6 @@ def batch_iterable(
                y[num_batches * batch_size:])
 
 
-class scaled_softmax:
-
-    def __init__(self, temp):
-        self.t = temp
-
-    def __call__(self, x):
-        return L.nonlinearities.softmax(x / self.t)
-
-
 class nnet:
 
     def __init__(
@@ -39,6 +30,18 @@ class nnet:
         nonlinearity=L.nonlinearities.sigmoid,
         clam=None
     ):
+        '''
+        n_out: output size
+        h_layer: hidden layer sizes
+        l_drops: dropout rates of hidden layers.
+            Set as None if dropout not to be used.
+        nonlinearity: activation function to be used.
+        lam: weight of the L2 regularizer.
+            Set as None if L2 regualizer not to be used.
+        clam: weight of VR regularizer.
+
+        Input size has been hardcoded to (3, 32, 32).
+        '''
 
         np.random.seed(0)
 
@@ -49,6 +52,7 @@ class nnet:
         l_in = L.layers.InputLayer(shape=(None, 3, 32, 32),
                                    input_var=self.input)
 
+        # Create the convolution layer.
         feat_maps = 10
         curr = L.layers.Conv2DLayer(
             l_in, num_filters=feat_maps, filter_size=(3, 3),
@@ -56,9 +60,12 @@ class nnet:
             nonlinearity=L.nonlinearities.rectify,
             W=L.init.GlorotUniform())
 
+        # Create the max-pooling layer.
         curr = L.layers.MaxPool2DLayer(curr, pool_size=(2, 2))
 
         for i, j in enumerate(h_layers):
+
+            # Create the layers.
             curr = L.layers.DenseLayer(
                 curr, num_units=j,
                 nonlinearity=nonlinearity,
@@ -74,18 +81,15 @@ class nnet:
                     curr, p=l_drops[i], rescale=True
                 )
 
-        final_nonlinearity = L.nonlinearities.softmax
-        if Temp != 1:
-            final_nonlinearity = scaled_softmax(Temp)
-
         self.output_layer = L.layers.DenseLayer(
             curr, num_units=n_out,
             nonlinearity=L.nonlinearities.linear
         )
         self.layers.append(self.output_layer)
 
+        # Create the softmax output layer.
         self.output_layer = L.layers.NonlinearityLayer(
-            self.output_layer, nonlinearity=final_nonlinearity)
+            self.output_layer, nonlinearity=L.nonlinearities.softmax)
 
         self.output = L.layers.get_output(self.output_layer)
         self.test_output = L.layers.get_output(
@@ -93,37 +97,44 @@ class nnet:
         )
         self.target = T.fmatrix('target')
 
+        # Get all parameters.
         regs = L.layers.get_all_params(self.output_layer, regularizable=True)
 
+        # Get the L2 regularization term
+        #       = mean of squares of weight parameters.
         self.reg = T.mean(regs[2] * regs[2])
         for par in regs[3:]:
             self.reg += T.mean(par * par)
 
+        # Get the classification loss term.
         self.loss = L.objectives.categorical_crossentropy(
             self.output, self.target
         )
+        self.loss = T.mean(self.loss)
 
+        # Get the first layer weights.
         l1wts = regs[1].dimshuffle(1, 0).reshape((-1, 1, 8, 8))
 
+        # Define the laplacian kernel.
         convlen = 3
         cW = [-1 for i in xrange(convlen * convlen)]
         cW[(convlen * convlen - 1) / 2] = convlen * convlen - 1
-
         cW = np.asarray(cW, dtype=T.config.floatX).reshape(
             1, 1, convlen, convlen)
-
         cW = TH.shared(cW, name='c')
 
-        clarity = conv.conv2d(l1wts, cW, border_mode='full')
-        self.closs = T.mean(clarity * clarity)
+        # Convolute the weight matrix.
+        conved = conv.conv2d(l1wts, cW, border_mode='full')
+        # Get the VL term.
+        self.vl = T.mean(conved * conved)
 
-        self.loss = T.mean(self.loss)
+        # Add the regularizer term to the total loss function if
+        # their parameters are not None.
         if clam is not None:
-            self.closs = clam * self.closs
-            self.loss += self.closs
+            self.vl = clam * self.vl
+            self.loss += self.vl
         else:
             self.reg += T.mean(regs[1] * regs[1])
-
         if lam is not None:
             self.reg = self.reg * lam
             self.loss += self.reg
@@ -151,11 +162,7 @@ class nnet:
         print "Training ... "
 
         params = L.layers.get_all_params(self.output_layer, trainable=True)
-        # grad = T.grad(self.loss, params)
-        # grads = []
-
-        outputs = [self.loss, self.closs, self.reg]
-        # outputs.extend(grad)
+        outputs = [self.loss, self.vl, self.reg]
         inputs = [self.input, self.target]
 
         updates = L.updates.nesterov_momentum(
@@ -166,34 +173,34 @@ class nnet:
 
         last_acc = 0.10
 
+        # For each iteration.
         for i in xrange(iters):
             tot_loss = 0.0
-            tot_closs = 0.0
+            tot_vl = 0.0
             tot_regloss = 0.0
             cnt = 0
+
+            # For each mini-batch.
             for bx, by in batch_iterable(x, y, batch_size):
+
+                # One training iteration
                 train_outs = self.trainer(bx, by)
                 [c_loss, tc_loss, reg_loss] = train_outs[0:3]
-                # grad_out = train_outs[3:]
-
-                # if np.random.rand() < 0.001:
-                #     for g in grad_out:
-                #         grads.extend(np.asarray(g).flatten())
 
                 tot_loss += c_loss
-                tot_closs += tc_loss
+                tot_vl += tc_loss
                 tot_regloss += reg_loss
                 cnt += 1
             print "Iteration {0}, Loss = {1}, {2}, {3}"\
-                .format(i, tot_loss / cnt, tot_closs / cnt, tot_regloss / cnt)
+                .format(i, tot_loss / cnt, tot_vl / cnt, tot_regloss / cnt)
             logfile.write(
                 '{} {} {}\n'.format(
-                    tot_loss / cnt, tot_closs / cnt, tot_regloss / cnt
+                    tot_loss / cnt, tot_vl / cnt, tot_regloss / cnt
                 )
             )
             logfile.flush()
 
-            if np.isnan(tot_loss) or np.isnan(tot_closs):
+            if np.isnan(tot_loss) or np.isnan(tot_vl):
                 return last_acc
 
             if testx is None or testy is None:
@@ -210,6 +217,7 @@ class nnet:
             if i >= 40 and last_acc <= 0.3:
                 return last_acc
 
+            # Decrease learning rate by 10 after every 'thresh' iterations.
             if i % thresh == 0 and i > 0:
                 lrate = np.float32(lrate / 10.0)
                 updates = L.updates.nesterov_momentum(
@@ -221,8 +229,6 @@ class nnet:
             sys.stdout.flush()
 
         logfile.close()
-        # grads = np.histogram(grads, bins=1000)
-        # np.savez(filename + '_grads.npz', grads)
 
         return self.test(testx, testy, batch_size)
 
@@ -263,33 +269,6 @@ class nnet:
 
     def getx(self):
         return self.maxinput.get_value()
-
-    def max_inp(self, layer_num, node_num, l_rate, gamma, iters, energy):
-        node = L.layers.get_output(
-            self.layers[layer_num], deterministic=True
-        )[0][node_num]
-
-        grad = T.grad(node, self.maxinput)
-        updates = [(self.maxinput, self.maxinput + grad)]
-
-        maxer = TH.function(
-            inputs=[],
-            outputs=[node],
-            updates=updates
-        )
-
-        print 'Maximizing ...'
-        for i in xrange(iters):
-            cval = maxer()
-            currx = self.getx()
-            currx = currx - (currx < 0) * currx
-            assert(np.all(currx >= 0))
-            curre = np.sqrt(np.sum(currx * currx))
-            if curre > 0:
-                self.setx(currx / curre * energy)
-
-        print 'Node value =', cval
-        return cval
 
     def get_layer(self, layer_num, input):
         layer = L.layers.get_output(
