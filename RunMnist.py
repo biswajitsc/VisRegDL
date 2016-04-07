@@ -15,6 +15,7 @@ import datetime
 import pandas as pd
 
 
+# Load training data
 train = pd.read_csv('./datasets/mnist/mnist_train.csv')
 
 trainX = train.values[:, 1:]
@@ -27,7 +28,7 @@ for i in xrange(num_examples):
 trainY = np.asarray(temp, dtype='float32')
 trainX = np.asarray(trainX, dtype='float32') / 255.0
 
-
+# Load testing data
 test = pd.read_csv('./datasets/mnist/mnist_test.csv')
 
 testX = test.values[:, 1:]
@@ -45,6 +46,11 @@ testX = testX.reshape(-1, 784)
 
 
 def main():
+    '''
+    Creates neural networks with various parameters and trains them.
+    '''
+    ####################################################
+    # VR + L2
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -56,8 +62,10 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.1, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_L2')
+               thresh=100, filename='runs/Mnist_Vr_L2')
 
+    ####################################################
+    # L2
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -71,6 +79,8 @@ def main():
                lrate=0.1, gamma=0.9, batch_size=100, iters=200,
                thresh=100, filename='runs/Mnist_L2')
 
+    ####################################################
+    # Vr + L2 + Dr
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -83,8 +93,10 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_L2_Dr')
+               thresh=100, filename='runs/Mnist_Vr_L2_Dr')
 
+    ####################################################
+    # L2 + Dr
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -99,6 +111,8 @@ def main():
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
                thresh=100, filename='runs/Mnist_L2_Dr')
 
+    ####################################################
+    # Dr
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -113,6 +127,8 @@ def main():
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
                thresh=100, filename='runs/Mnist_Dr')
 
+    ####################################################
+    # Vr + Dr
     nnet = LN.nnet(
         n_in=784,
         n_out=10,
@@ -125,8 +141,8 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=100, filename='runs/Mnist_Vl_Dr')
-
+               thresh=100, filename='runs/Mnist_Vr_Dr')
+    ####################################################
 
 if __name__ == '__main__':
     main()

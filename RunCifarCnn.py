@@ -59,6 +59,11 @@ testX = testX.reshape(-1, 3, 32, 32)
 
 
 def main():
+    '''
+    Creates neural networks with various parameters and trains them.
+    '''
+    ####################################################
+    # VR + L2
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -70,8 +75,10 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_L2')
+               thresh=70, filename='runs/Cifar_Vr_L2')
 
+    ####################################################
+    # L2
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -85,6 +92,8 @@ def main():
                lrate=0.01, gamma=0.9, batch_size=100, iters=200,
                thresh=70, filename='runs/Cifar_L2')
 
+    ####################################################
+    # Vr + L2 + Dr
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -97,8 +106,10 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_L2_Dr')
+               thresh=70, filename='runs/Cifar_Vr_L2_Dr')
 
+    ####################################################
+    # L2 + Dr
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -113,6 +124,8 @@ def main():
                lrate=0.001, gamma=0.9, batch_size=100, iters=200,
                thresh=70, filename='runs/Cifar_L2_Dr')
 
+    ####################################################
+    # Dr
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -127,6 +140,8 @@ def main():
                lrate=0.001, gamma=0.9, batch_size=100, iters=200,
                thresh=70, filename='runs/Cifar_Dr')
 
+    ####################################################
+    # Vr + Dr
     nnet = LN.nnet(
         n_out=10,
         h_layers=[1000, 1000],
@@ -139,8 +154,8 @@ def main():
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
                lrate=0.005, gamma=0.9, batch_size=100, iters=200,
-               thresh=70, filename='runs/Cifar_Vl_Dr')
-
+               thresh=70, filename='runs/Cifar_Vr_Dr')
+    ####################################################
 
 if __name__ == '__main__':
     main()
