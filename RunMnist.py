@@ -1,5 +1,5 @@
 import theano.sandbox.cuda
-theano.sandbox.cuda.use('gpu1')
+theano.sandbox.cuda.use('gpu0')
 
 import numpy as np
 import cPickle as cP
