@@ -22,14 +22,14 @@ def unpickle(file):
     return dict
 
 
-trainX1 = unpickle('./datasets/cifar10/cifar-10-batches-py/data_batch_1')
-trainX2 = unpickle('./datasets/cifar10/cifar-10-batches-py/data_batch_2')
-trainX3 = unpickle('./datasets/cifar10/cifar-10-batches-py/data_batch_3')
-trainX4 = unpickle('./datasets/cifar10/cifar-10-batches-py/data_batch_4')
-trainX5 = unpickle('./datasets/cifar10/cifar-10-batches-py/data_batch_5')
-testX = unpickle('./datasets/cifar10/cifar-10-batches-py/test_batch')
+trainX1 = unpickle('./datasets/cifar/cifar-10-batches-py/data_batch_1')
+trainX2 = unpickle('./datasets/cifar/cifar-10-batches-py/data_batch_2')
+trainX3 = unpickle('./datasets/cifar/cifar-10-batches-py/data_batch_3')
+trainX4 = unpickle('./datasets/cifar/cifar-10-batches-py/data_batch_4')
+trainX5 = unpickle('./datasets/cifar/cifar-10-batches-py/data_batch_5')
+testX = unpickle('./datasets/cifar/cifar-10-batches-py/test_batch')
 
-labelname = unpickle('./datasets/cifar10/cifar-10-batches-py/batches.meta')
+labelname = unpickle('./datasets/cifar/cifar-10-batches-py/batches.meta')
 
 trainX = np.vstack((trainX1['data'], trainX2['data'], trainX3[
                    'data'], trainX4['data'], trainX5['data']))
