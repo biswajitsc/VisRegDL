@@ -152,7 +152,7 @@ def main():
     )
 
     nnet.train(x=trainX, y=trainY, testx=testX, testy=testY,
-               lrate=0.005, gamma=0.9, batch_size=100, iters=200,
+               lrate=0.007, gamma=0.9, batch_size=100, iters=200,
                thresh=100, filename='runs/Mnist_Vr_Dr')
     ####################################################
 
