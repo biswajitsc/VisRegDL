@@ -1,5 +1,5 @@
 # VisRegDL
-Implementation of the visualization regularizer for neural networks trained on image tasks.
+Implementation of the visualization regularizer ([arXiv](https://arxiv.org/abs/1604.02646)) for neural networks trained on image tasks.
 
 Instructions
 ============
